@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    RkGpioManager.getInstance().startGpioScan(50, 0, new RkGpioManager.onGpioReceiver() {
+                    RkGpioManager.getInstance().startGpioScan( new RkGpioManager.onGpioReceiver() {
                         @Override
                         public void onGpioReceiver(int gpio) {
                             Log.d("xxxxxxxxxx", " press succ: "+ gpio);
@@ -28,5 +28,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, 1000);
+
+        RkGpioManager.getInstance().stopGpioScan();
     }
 }

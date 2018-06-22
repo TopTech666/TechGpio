@@ -43,9 +43,14 @@ public class RkGpioManager {
         return sRkGpioManager;
     }
 
+    //默认按键检测间隔30ms ， 按键触发10s内无法触发
+    public void startGpioScan(onGpioReceiver onGpioReceiver,  int... gpios ) throws Exception {
+          startGpioScan(30, 10*1000 , onGpioReceiver, gpios);
+    }
+
     /**
      *  开启按键检测程序
-     * @param scanSpaceMs 按键检测间隔时间  (单位 ms)  10ms - 60s  注意延时太长按键不灵敏
+     * @param scanSpaceMs 按键检测间隔时间  (单位 ms)  10ms - 60ms  注意延时太长按键不灵敏
      * @param invalidTriggerTime  按键触发后多长时间无法触发 （单位 ms）
      * @param onGpioReceiver gpio 按键回调监听
      * @param gpios 需要遍历的gpio  （1， 2， 3， 4， 5 ）
