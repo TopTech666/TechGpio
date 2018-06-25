@@ -1,6 +1,7 @@
 package com.cwgj.gpio_lib;
 
 import android.os.Gpio;
+import android.util.Log;
 
 /**
  * +----------------------------------------------------------------------
@@ -20,22 +21,28 @@ public class RkGpioManager {
       4）可启动，可停止
       5）设置多长间隔内无法再次触发（暂定10秒）*/
 
-  public static final int NORMAL_GPIO_VALUE = -1;
+
+    public static final int NORMAL_GPIO_VALUE = -1;
+
+    public boolean isWorking() {
+        return isWorking;
+    }
 
     //子线程遍历是否在进行
-    private boolean isWorking = false;
+    private boolean isWorking;
 
     //按键检测线程
     private Thread mThread;
 
     private static RkGpioManager sRkGpioManager;
 
-    private RkGpioManager(){}
+    private RkGpioManager() {
+    }
 
-    public static RkGpioManager getInstance(){
-        if(sRkGpioManager == null){
-            synchronized (RkGpioManager.class){
-                if(sRkGpioManager == null){
+    public static RkGpioManager getInstance() {
+        if (sRkGpioManager == null) {
+            synchronized (RkGpioManager.class) {
+                if (sRkGpioManager == null) {
                     sRkGpioManager = new RkGpioManager();
                 }
             }
@@ -44,19 +51,22 @@ public class RkGpioManager {
     }
 
     //默认按键检测间隔30ms ， 按键触发10s内无法触发
-    public void startGpioScan(onGpioReceiver onGpioReceiver,  int... gpios ) throws Exception {
-          startGpioScan(30, 10*1000 , onGpioReceiver, gpios);
+    public void init(onGpioReceiver onGpioReceiver, int... gpios) throws Exception {
+        initData(30, 10 * 1000, onGpioReceiver, gpios);
     }
 
     /**
-     *  开启按键检测程序
-     * @param scanSpaceMs 按键检测间隔时间  (单位 ms)  10ms - 60ms  注意延时太长按键不灵敏
-     * @param invalidTriggerTime  按键触发后多长时间无法触发 （单位 ms）
-     * @param onGpioReceiver gpio 按键回调监听
-     * @param gpios 需要遍历的gpio  （1， 2， 3， 4， 5 ）
+     * 开启按键检测程序
+     *
+     * @param scanSpaceMs        按键检测间隔时间  (单位 ms)  10ms - 60ms  注意延时太长按键不灵敏
+     * @param invalidTriggerTime 按键触发后多长时间无法触发 （单位 ms）
+     * @param onGpioReceiver     gpio 按键回调监听
+     * @param gpios              需要遍历的gpio  （1， 2， 3， 4， 5 ）
      */
-    public void startGpioScan(final int scanSpaceMs, final int invalidTriggerTime, final onGpioReceiver onGpioReceiver, final int... gpios) throws Exception {
-        if(scanSpaceMs< 10 || scanSpaceMs>60){
+    public void initData(final int scanSpaceMs, final int invalidTriggerTime, final onGpioReceiver onGpioReceiver, final int... gpios) throws Exception {
+        if (mThread != null) return;
+
+        if (scanSpaceMs < 10 || scanSpaceMs > 60) {
             throw new Exception("invalidTriggerTime is error");
         }
         //设置为工作状态
@@ -68,71 +78,80 @@ public class RkGpioManager {
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (isWorking){
+                while (isWorking) {
+                    Log.d("init", "正在执行");
                     try {
                         int params1 = getGpioValue(gpios);
-                        if( params1 == NORMAL_GPIO_VALUE){
+                        if (params1 == NORMAL_GPIO_VALUE) {
                             //没有按键按下,延时20ms再检测
                             Thread.sleep(scanSpaceMs);
-                        }else {
+                        } else {
                             //检测到有按键按下,延时20ms消抖
                             Thread.sleep(scanSpaceMs);
                             int params2 = getGpioValue(gpios);
-                            if(params2 == params1){
+                            if (params2 == params1) {
                                 //20ms后仍然是按下,认为是有效按键
-                                if(onGpioReceiver!=null)
-                                   onGpioReceiver.onGpioReceiver(params2);
+                                if (onGpioReceiver != null)
+                                    onGpioReceiver.onGpioReceiver(params2);
                                 //间隔一定时间 (10s) 才可以继续触发按键
                                 Thread.sleep(invalidTriggerTime);
-                                while (getGpioValue(gpios)!= NORMAL_GPIO_VALUE){
+                                while (getGpioValue(gpios) != NORMAL_GPIO_VALUE) {
                                     //等待按键被释放
                                     Thread.sleep(scanSpaceMs);
                                 }
                             }
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
-        mThread.start();
     }
 
+    //启动gpio监听
+    public void startGPIOScan() throws Exception {
+        if (mThread == null) {
+            throw new Exception("GPIO线程未启动");
+        }
+        isWorking = true;
+        if (!mThread.isAlive())
+            mThread.start();
+    }
 
     //停止gpio按键检测
-    public void stopGpioScan(){
+    public void stopGpioScan() {
         isWorking = false;
     }
 
     /**
      * 遍历gpio 引脚电平变化 gpio1 - gpio5
+     *
      * @param gpios
      * @return
      */
-   private int getGpioValue(int... gpios){
-       for (int i = 0; i < gpios.length; i++) {
-           //gpio 是从 1 开始, 这里存在问题是，如果同时按下2个按键，只会响应第1个
-           int gpioValue = Gpio.GetGpioValue(getGpioPinName(gpios[i]));
-           if(gpioValue == 0){
-               //有按键按下,返回gpio引脚号
-               return gpios[i];
-           }
+    private int getGpioValue(int... gpios) {
+        for (int i = 0; i < gpios.length; i++) {
+            //gpio 是从 1 开始, 这里存在问题是，如果同时按下2个按键，只会响应第1个
+            int gpioValue = Gpio.GetGpioValue(getGpioPinName(gpios[i]));
+            if (gpioValue == 0) {
+                //有按键按下,返回gpio引脚号
+                return gpios[i];
+            }
         }
         return -1;
-   }
-
+    }
 
 
     //gpio名称
-    private String getGpioPinName(int gpio){
+    private String getGpioPinName(int gpio) {
         return "gpio".concat(String.valueOf(gpio));
     }
 
 
     //gpio有效按键被回调
     public interface onGpioReceiver {
-        void onGpioReceiver( int gpio);
+        void onGpioReceiver(int gpio);
     }
 
 
