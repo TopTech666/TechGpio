@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onGpioReceiver(int gpio) {
                             Log.d("xxxxxxxxxx", " press succ: "+ gpio);
+                            RkGpioManager.getInstance().stopGpioScan();
                         }
                     }, 4);
                 } catch (Exception e) {
@@ -29,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 1000);
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         RkGpioManager.getInstance().stopGpioScan();
     }
 }
