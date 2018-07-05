@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TechGpio.iml" filepath="$PROJECT_DIR$/.idea/TechGpio.iml" />
       <module fileurl="file://$PROJECT_DIR$/TechGpio.iml" filepath="$PROJECT_DIR$/TechGpio.iml" />
+      <module fileurl="file://D:\TechGpio\.idea\TechGpio.iml" filepath="D:\TechGpio\.idea\TechGpio.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/gpio_lib/gpio_lib.iml" filepath="$PROJECT_DIR$/gpio_lib/gpio_lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/gpio_lib/gpio_lib.iml" filepath="$PROJECT_DIR$/gpio_lib/gpio_lib.iml" />
     </modules>
   </component>

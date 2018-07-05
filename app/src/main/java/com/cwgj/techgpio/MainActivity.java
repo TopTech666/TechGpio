@@ -1,58 +1,99 @@
 package com.cwgj.techgpio;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.widget.TextView;
 
 import com.cwgj.gpio_lib.RkGpioManager;
 
 public class MainActivity extends AppCompatActivity {
-    boolean isContinue = true;
+
+    TextView tv_gpio5, tv_gpio4, tv_gpio3, tv_gpio2, tv_gpio1;
+
+    int nomalStateColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Thread testThred = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (isContinue) {
-                    System.out.println("testThred 正在执行");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        tv_gpio5 =  findViewById(R.id.tv_gpio5);
+        tv_gpio4 =  findViewById(R.id.tv_gpio4);
+        tv_gpio3 =  findViewById(R.id.tv_gpio3);
+        tv_gpio2 =  findViewById(R.id.tv_gpio2);
+        tv_gpio1 =  findViewById(R.id.tv_gpio1);
 
-                }
-            }
-        });
-        System.out.println("是否活着1" + testThred.isAlive());
-        testThred.start();
-        System.out.println("是否活着2" + testThred.isAlive());
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                isContinue = false;
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("是否活着3" + testThred.isAlive());
+        nomalStateColor = getResources().getColor(R.color.color_blue);
 
-                isContinue = true;
-                testThred.start();
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        try {
+            RkGpioManager.getInstance().initData(30, 1000, new RkGpioManager.onGpioReceiver() {
+                @Override
+                public void onGpioReceiver(final int gpio) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(gpio == 5){
+                                tv_gpio5.setText("测试成功, 为低电平");
+                                tv_gpio5.setTextColor(nomalStateColor);
+                            }else if(gpio == 4){
+                                tv_gpio4.setText("测试成功, 为低电平");
+                                tv_gpio4.setTextColor(nomalStateColor);
+                            }else if(gpio == 3){
+                                tv_gpio3.setText("测试成功, 为低电平");
+                                tv_gpio3.setTextColor(nomalStateColor);
+                            }else if(gpio == 2){
+                                tv_gpio2.setText("测试成功, 为低电平");
+                                tv_gpio2.setTextColor(nomalStateColor);
+                            }else if(gpio == 1){
+                                tv_gpio1.setText("测试成功, 为低电平");
+                                tv_gpio1.setTextColor(nomalStateColor);
+                            }
+                        }
+                    });
                 }
-                System.out.println("是否活着4" + testThred.isAlive());
-
-            }
-        }, 2000);
+            }, 1, 2, 3, 4, 5);
+            RkGpioManager.getInstance().startGPIOScan();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        final Thread testThred = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (isContinue) {
+//                    System.out.println("testThred 正在执行");
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            }
+//        });
+//        System.out.println("是否活着1" + testThred.isAlive());
+//        testThred.start();
+//        System.out.println("是否活着2" + testThred.isAlive());
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                isContinue = false;
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                System.out.println("是否活着3" + testThred.isAlive());
+//
+//                isContinue = true;
+//                testThred.start();
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                System.out.println("是否活着4" + testThred.isAlive());
+//
+//            }
+//        }, 2000);
 
 
 //        getWindow().getDecorView().postDelayed(new Runnable() {
@@ -77,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        RkGpioManager.getInstance().stopGpioScan();
+        RkGpioManager.getInstance().stopGpioScan();
     }
+
+
 }

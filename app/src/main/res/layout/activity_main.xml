@@ -1,12 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textSize="20sp"
+          android:textColor="@android:color/black"
+          android:text="GPIO5:   "/>
+
+      <TextView
+          android:id="@+id/tv_gpio5"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="等待测试..."
+          android:textSize="18sp"
+          android:textColor="@android:color/darker_gray"/>
+  </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="GPIO4:   "/>
+
+        <TextView
+            android:id="@+id/tv_gpio4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="等待测试..."
+            android:textSize="18sp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="GPIO3:   "/>
+
+        <TextView
+            android:id="@+id/tv_gpio3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="等待测试..."
+            android:textSize="18sp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="GPIO2:   "/>
+
+        <TextView
+            android:id="@+id/tv_gpio2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="等待测试..."
+            android:textSize="18sp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="GPIO1:   "/>
+
+        <TextView
+            android:id="@+id/tv_gpio1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="等待测试..."
+            android:textSize="18sp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:layout_marginTop="15dp"
+        android:text="操作方法：  按下对应的GPIO按键，等待测试会更新到测试成功"
+        android:textSize="15sp"
+        android:textColor="@android:color/black"/>
 
-</RelativeLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="注释：  GPIO正常状态为高电平，按键按下触发为低电平"
+        android:textSize="15sp"
+        android:textColor="@android:color/holo_red_light"/>
+
+
+
+</LinearLayout>
