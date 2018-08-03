@@ -79,60 +79,54 @@ public class RkGpioManager {
             //设置为gpio为读取模式
             Gpio.SetGpioInput(getGpioPinName(gpios[i]));
         }
-        mThread = new Thread(new Runnable() {
+        Runnable mRunnable = new Runnable() {
             @Override
             public void run() {
                 beginTime = System.currentTimeMillis();
-                while (isWorking) {
-                    Log.d("init", "监听gpio");
-                    try {
-                        int params1 = getGpioValue(gpios);
-                        if (params1 == NORMAL_GPIO_VALUE) {
-                            //没有按键按下,延时20ms再检测
-                            Thread.sleep(scanSpaceMs);
-                        } else {
-                            //检测到有按键按下,延时20ms消抖
-                            Thread.sleep(scanSpaceMs);
-                            int params2 = getGpioValue(gpios);
-                            if (params2 == params1) {
-                                //20ms后仍然是按下,认为是有效按键
-                                if (onGpioReceiver != null) {
-                                    onGpioReceiver.onGpioReceiver(params2);
-                                    beginTime = System.currentTimeMillis();//按完顺延
+                while (true) {
+                    if (isWorking) {
+                        Log.d("init", "监听gpio");
+                        try {
+                            int params1 = getGpioValue(gpios);
+                            if (params1 == NORMAL_GPIO_VALUE) {
+                                //没有按键按下,延时20ms再检测
+                                Thread.sleep(scanSpaceMs);
+                            } else {
+                                //检测到有按键按下,延时20ms消抖
+                                Thread.sleep(scanSpaceMs);
+                                int params2 = getGpioValue(gpios);
+                                if (params2 == params1) {
+                                    //20ms后仍然是按下,认为是有效按键
+                                    if (onGpioReceiver != null) {
+                                        onGpioReceiver.onGpioReceiver(params2);
+                                        beginTime = System.currentTimeMillis();//按完顺延
 
-                                }
+                                    }
 
-                                //间隔一定时间 (10s) 才可以继续触发按键
-                                Thread.sleep(invalidTriggerTime);
-                                while (getGpioValue(gpios) != NORMAL_GPIO_VALUE) {
-                                    //等待按键被释放
-                                    Thread.sleep(scanSpaceMs);
+                                    //间隔一定时间 (10s) 才可以继续触发按键
+                                    Thread.sleep(invalidTriggerTime);
+                                    while (getGpioValue(gpios) != NORMAL_GPIO_VALUE) {
+                                        //等待按键被释放
+                                        Thread.sleep(scanSpaceMs);
+                                    }
                                 }
                             }
+                            if ((System.currentTimeMillis() - beginTime) >= (aliveTime * 1000 * 60)) { //超过期限就自动停止监听
+                                stopGpioScan();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        if ((System.currentTimeMillis() - beginTime) >= (aliveTime * 1000 * 60)) { //超过期限就自动停止监听
-                            stopGpioScan();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
             }
-        });
+        };
+        new Thread(mRunnable).start();
     }
 
     //启动gpio监听
     public void startGPIOScan() throws Exception {
-        if (mThread == null) {
-            throw new Exception("GPIO线程未启动");
-        }
         isWorking = true;
-        try{
-            mThread.start();
-        }catch (Exception e){
-            mThread.run();
-            e.printStackTrace();
-        }
     }
 
     //停止gpio按键检测
