@@ -52,7 +52,7 @@ public class RkGpioManager {
 
     //默认按键检测间隔30ms ， 按键触发10s内无法触发
     public void init(onGpioReceiver onGpioReceiver, int... gpios) throws Exception {
-        initData(30, 10 * 1000, 10,onGpioReceiver, gpios);
+        initData(30, 10 * 1000, 10, onGpioReceiver, gpios);
     }
 
     /**
@@ -62,10 +62,10 @@ public class RkGpioManager {
      * @param invalidTriggerTime 按键触发后多长时间无法触发 （单位 ms）
      * @param onGpioReceiver     gpio 按键回调监听
      * @param aliveTime     最长连续监听时间 单位分钟
-
      * @param gpios              需要遍历的gpio  （1， 2， 3， 4， 5 ）
      */
     long beginTime;//开始监听事件
+
     public void initData(final int scanSpaceMs, final int invalidTriggerTime, final int aliveTime,
                          final onGpioReceiver onGpioReceiver, final int... gpios) throws Exception {
         if (mThread != null) return;
@@ -82,7 +82,7 @@ public class RkGpioManager {
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                beginTime=System.currentTimeMillis();
+                beginTime = System.currentTimeMillis();
                 while (isWorking) {
                     Log.d("init", "监听gpio");
                     try {
@@ -96,8 +96,12 @@ public class RkGpioManager {
                             int params2 = getGpioValue(gpios);
                             if (params2 == params1) {
                                 //20ms后仍然是按下,认为是有效按键
-                                if (onGpioReceiver != null)
+                                if (onGpioReceiver != null) {
                                     onGpioReceiver.onGpioReceiver(params2);
+                                    beginTime = System.currentTimeMillis();//按完顺延
+
+                                }
+
                                 //间隔一定时间 (10s) 才可以继续触发按键
                                 Thread.sleep(invalidTriggerTime);
                                 while (getGpioValue(gpios) != NORMAL_GPIO_VALUE) {
@@ -106,8 +110,8 @@ public class RkGpioManager {
                                 }
                             }
                         }
-                        if((System.currentTimeMillis()-beginTime)>=(aliveTime*1000*60)){ //超过期限就自动停止监听
-                           stopGpioScan();
+                        if ((System.currentTimeMillis() - beginTime) >= (aliveTime * 1000 * 60)) { //超过期限就自动停止监听
+                            stopGpioScan();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
