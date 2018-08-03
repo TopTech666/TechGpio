@@ -128,7 +128,7 @@ public class RkGpioManager {
         }
         isWorking = true;
         if (!mThread.isAlive())
-            mThread.start();
+            mThread.run();
     }
 
     //停止gpio按键检测
