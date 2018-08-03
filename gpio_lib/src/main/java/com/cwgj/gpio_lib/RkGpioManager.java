@@ -52,7 +52,7 @@ public class RkGpioManager {
 
     //默认按键检测间隔30ms ， 按键触发10s内无法触发
     public void init(onGpioReceiver onGpioReceiver, int... gpios) throws Exception {
-        initData(30, 10 * 1000, onGpioReceiver, gpios);
+        initData(30, 10 * 1000, 10,onGpioReceiver, gpios);
     }
 
     /**
@@ -61,9 +61,13 @@ public class RkGpioManager {
      * @param scanSpaceMs        按键检测间隔时间  (单位 ms)  10ms - 60ms  注意延时太长按键不灵敏
      * @param invalidTriggerTime 按键触发后多长时间无法触发 （单位 ms）
      * @param onGpioReceiver     gpio 按键回调监听
+     * @param aliveTime     最长连续监听时间 单位分钟
+
      * @param gpios              需要遍历的gpio  （1， 2， 3， 4， 5 ）
      */
-    public void initData(final int scanSpaceMs, final int invalidTriggerTime, final onGpioReceiver onGpioReceiver, final int... gpios) throws Exception {
+    long beginTime;//开始监听事件
+    public void initData(final int scanSpaceMs, final int invalidTriggerTime, final int aliveTime,
+                         final onGpioReceiver onGpioReceiver, final int... gpios) throws Exception {
         if (mThread != null) return;
 
         if (scanSpaceMs < 10 || scanSpaceMs > 60) {
@@ -78,8 +82,9 @@ public class RkGpioManager {
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                beginTime=System.currentTimeMillis();
                 while (isWorking) {
-                    Log.d("init", "正在执行");
+                    Log.d("init", "监听gpio");
                     try {
                         int params1 = getGpioValue(gpios);
                         if (params1 == NORMAL_GPIO_VALUE) {
@@ -100,6 +105,9 @@ public class RkGpioManager {
                                     Thread.sleep(scanSpaceMs);
                                 }
                             }
+                        }
+                        if((System.currentTimeMillis()-beginTime)>=(aliveTime*1000*60)){ //超过期限就自动停止监听
+                           stopGpioScan();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
