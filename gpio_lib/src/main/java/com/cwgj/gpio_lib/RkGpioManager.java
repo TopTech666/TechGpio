@@ -127,8 +127,12 @@ public class RkGpioManager {
             throw new Exception("GPIO线程未启动");
         }
         isWorking = true;
-        if (!mThread.isAlive())
+        try{
+            mThread.start();
+        }catch (Exception e){
             mThread.run();
+            e.printStackTrace();
+        }
     }
 
     //停止gpio按键检测
